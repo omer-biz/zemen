@@ -5,7 +5,6 @@ use conversion::jdn_to_eth;
 use time::{self, error};
 
 mod conversion;
-mod validator;
 
 // Maybe change the name of  this struct to `Werh` which translates to month in `ge'ez`, to avoid
 // conflict with `time::Month`.

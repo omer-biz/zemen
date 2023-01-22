@@ -2,6 +2,15 @@
 name = "zemen"
 version = "0.1.0"
 edition = "2021"
+authors = ["Omer Abdulaziz <omerabdi@pm.me>"]
+rust-version = "1.66.0"
+description = "Ethiopian to Gregorian conversion utility"
+readme = "README.md"
+repository = "https://github.com/omer-biz/zemen/"
+license = "MIT"
+license-file = "LICENSE"
+keywords = ["ethiopian", "convert", "date", "gregorian", "ethiopia"]
+categories = ["date-and-time"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

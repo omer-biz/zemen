@@ -15,7 +15,7 @@ fn modl(i: i32, j: i32) -> i32 {
 /// in ethiopic date format.
 ///
 /// Doesn't not check the validity of the proviced date.
-fn eth_to_jdn(year: i32, month: i32, day: i32) -> i32 {
+pub fn eth_to_jdn(year: i32, month: i32, day: i32) -> i32 {
     (JDN_EPOCH_OFFSET_ETH + 365)
     + 365 * (year - 1)
     + (year / 4)
@@ -26,7 +26,7 @@ fn eth_to_jdn(year: i32, month: i32, day: i32) -> i32 {
 /// Returns the ethiopic date, given jdn, as (year, month, day)
 ///
 /// Doesn't check for the validity of the provided Julian day number.
-fn jdn_to_eth(jdn: i32) -> (i32, u8, u8) {
+pub fn jdn_to_eth(jdn: i32) -> (i32, u8, u8) {
     let r = modl(jdn - JDN_EPOCH_OFFSET_ETH, 1461);
     let n = modl(r, 365) + 365 * (r / 1460);
 
@@ -41,8 +41,8 @@ fn jdn_to_eth(jdn: i32) -> (i32, u8, u8) {
 
 /// Tries to create a Gregorian date from Ethiopian date.
 ///
-pub fn eth_to_gre(year: i32, month: i32, day: i32) -> Result<time::Date, error::ComponentRange> {
-    let jdn = eth_to_jdn(year, month, day);
+pub fn eth_to_gre(year: i32, month: u8, day: u8) -> Result<time::Date, error::ComponentRange> {
+    let jdn = eth_to_jdn(year, month as i32, day as i32);
     let date = time::Date::from_julian_day(jdn)?;
 
     Ok(date)
@@ -50,12 +50,12 @@ pub fn eth_to_gre(year: i32, month: i32, day: i32) -> Result<time::Date, error::
 
 /// Tries to create an Ethiopian date from Gregorian date.
 ///
-pub fn gre_to_eth(year: i32, month: i32, day: i32) -> Result<Zemen, error::ComponentRange> {
+pub fn gre_to_eth(year: i32, month: u8, day: u8) -> Result<Zemen, error::ComponentRange> {
     let month = Month::try_from(month as u8)?;
     let date = time::Date::from_calendar_date(year, month, day as u8)?;
     let (year, month, day) = jdn_to_eth(date.to_julian_day());
 
-    Ok(Zemen::new(year, month , day))
+    Ok(Zemen::new(year, month , day)?)
 }
 
 #[cfg(test)]
@@ -64,13 +64,13 @@ mod basic_conversion {
 
     #[test]
     fn test_gre_to_eth() -> Result<(), error::ComponentRange> {
-        let zemen = Zemen::new(1992, 4, 22);
+        let zemen = Zemen::new(1992, 4, 22)?;
         assert_eq!(zemen, gre_to_eth(2000, 1, 1)?);
 
-        let zemen = Zemen::new(2015, 5, 11);
+        let zemen = Zemen::new(2015, 5, 11)?;
         assert_eq!(zemen, gre_to_eth(2023, 1, 19)?);
 
-        let zemen = Zemen::new(1915, 9, 7);
+        let zemen = Zemen::new(1915, 9, 7)?;
         assert_eq!(zemen, gre_to_eth(1923, 5, 15)?);
 
         // should fail

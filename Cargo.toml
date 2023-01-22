@@ -8,7 +8,6 @@ description = "Ethiopian to Gregorian conversion utility"
 readme = "README.md"
 repository = "https://github.com/omer-biz/zemen/"
 license = "MIT"
-license-file = "LICENSE"
 keywords = ["ethiopian", "convert", "date", "gregorian", "ethiopia"]
 categories = ["date-and-time"]
 

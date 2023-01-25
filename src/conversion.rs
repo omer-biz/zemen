@@ -1,5 +1,6 @@
-use time::{self, error, Month};
+use time;
 use crate::Zemen;
+use crate::error;
 /*
 * # For Ethiopian
 * - http://www.geez.org/Calendars/
@@ -14,7 +15,7 @@ fn modl(i: i32, j: i32) -> i32 {
 /// Returns the Julian day number (`jdn`) given `year`, `month`, and `day`
 /// in ethiopic date format.
 ///
-/// Doesn't not check the validity of the proviced date.
+/// Doesn't not check the validity of the provided date.
 pub fn eth_to_jdn(year: i32, month: i32, day: i32) -> i32 {
     (JDN_EPOCH_OFFSET_ETH + 365)
     + 365 * (year - 1)
@@ -41,7 +42,7 @@ pub fn jdn_to_eth(jdn: i32) -> (i32, u8, u8) {
 
 /// Tries to create a Gregorian date from Ethiopian date.
 ///
-pub fn eth_to_gre(year: i32, month: u8, day: u8) -> Result<time::Date, error::ComponentRange> {
+pub fn eth_to_gre(year: i32, month: u8, day: u8) -> Result<time::Date, error::Error> {
     let jdn = eth_to_jdn(year, month as i32, day as i32);
     let date = time::Date::from_julian_day(jdn)?;
 
@@ -50,8 +51,8 @@ pub fn eth_to_gre(year: i32, month: u8, day: u8) -> Result<time::Date, error::Co
 
 /// Tries to create an Ethiopian date from Gregorian date.
 ///
-pub fn gre_to_eth(year: i32, month: u8, day: u8) -> Result<Zemen, error::ComponentRange> {
-    let month = Month::try_from(month as u8)?;
+pub fn gre_to_eth(year: i32, month: u8, day: u8) -> Result<Zemen, error::Error> {
+    let month = time::Month::try_from(month as u8)?;
     let date = time::Date::from_calendar_date(year, month, day as u8)?;
     let (year, month, day) = jdn_to_eth(date.to_julian_day());
 
@@ -63,7 +64,7 @@ mod basic_conversion {
     use super::*;
 
     #[test]
-    fn test_gre_to_eth() -> Result<(), error::ComponentRange> {
+    fn test_gre_to_eth() -> Result<(), error::Error> {
         let zemen = Zemen::new(1992, 4, 22)?;
         assert_eq!(zemen, gre_to_eth(2000, 1, 1)?);
 
@@ -82,7 +83,7 @@ mod basic_conversion {
     }
 
     #[test]
-    fn test_eth_to_gre() -> Result<(), error::ComponentRange> {
+    fn test_eth_to_gre() -> Result<(), error::Error> {
         let (year, month, day) = (2000, 1, 1);
         let month = time::Month::try_from(month)?;
         let gre_date = time::Date::from_calendar_date(year, month, day)?;

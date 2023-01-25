@@ -7,7 +7,7 @@ use crate::error;
 // conflict with `time::Month`.
 /// Months of the Ethiopian year.
 #[derive(Clone, Debug, PartialEq, Copy)]
-pub enum Month {
+pub enum Werh {
     Meskerem = 1,
     Tikimit = 2,
     Hedar = 3,
@@ -23,7 +23,7 @@ pub enum Month {
     Puagme = 13
 }
 
-impl TryFrom<u8> for Month {
+impl TryFrom<u8> for Werh {
     type Error = error::InvalidDateRangeError;
 
     fn try_from(num: u8) -> Result<Self, Self::Error> {
@@ -49,28 +49,28 @@ impl TryFrom<u8> for Month {
 }
 
 
-impl FromStr for Month {
+impl FromStr for Werh {
     type Err = error::InvalidVariant;
 
     fn from_str(month_name: &str) -> Result<Self, Self::Err> {
         match month_name {
-            "Meskerem" => Ok(Month::Meskerem),
-            "Tikimit" => Ok(Month::Tikimit),
-            "Hedar" => Ok(Month::Hedar),
-            "Tahasass" => Ok(Month::Tahasass),
-            "Yekatit" => Ok(Month::Yekatit),
-            "Megabit" => Ok(Month::Megabit),
-            "Miyazia" => Ok(Month::Miyazia),
-            "Sene" => Ok(Month::Sene),
-            "Hamle" => Ok(Month::Hamle),
-            "Nehase" => Ok(Month::Nehase),
-            "Puagme" => Ok(Month::Puagme),
+            "Meskerem" => Ok(Werh::Meskerem),
+            "Tikimit" => Ok(Werh::Tikimit),
+            "Hedar" => Ok(Werh::Hedar),
+            "Tahasass" => Ok(Werh::Tahasass),
+            "Yekatit" => Ok(Werh::Yekatit),
+            "Megabit" => Ok(Werh::Megabit),
+            "Miyazia" => Ok(Werh::Miyazia),
+            "Sene" => Ok(Werh::Sene),
+            "Hamle" => Ok(Werh::Hamle),
+            "Nehase" => Ok(Werh::Nehase),
+            "Puagme" => Ok(Werh::Puagme),
             _ => Err(error::InvalidVariant { name: "Month" }),
         }
     }
 }
 
-impl fmt::Display for Month {
+impl fmt::Display for Werh {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(match self {
             Self::Meskerem => "መስከረም",

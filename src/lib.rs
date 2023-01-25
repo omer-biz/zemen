@@ -2,15 +2,15 @@ use std::fmt;
 use time;
 
 mod conversion;
-mod month;
+mod werh;
 pub mod error;
-pub use month::Month;
+pub use werh::Werh;
 
 /// An Ethiopian Date.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Zemen {
     year: i32,
-    month: Month,
+    month: Werh,
     day: u8,
 }
 
@@ -58,7 +58,7 @@ impl From<&time::Date> for Zemen {
 impl Zemen {
     fn new(year: i32, month: u8, day: u8) -> Result<Self, error::Error> {
         // TODO: validate Ethiopian date
-        let month = Month::try_from(month)?;
+        let month = Werh::try_from(month)?;
         Ok(Zemen { year, month, day })
     }
 
@@ -67,10 +67,10 @@ impl Zemen {
     ///
     /// ```rust
     /// # use zemen::Zemen;
-    /// # use zemen::Month;
+    /// # use zemen::Werh;
     /// # use zemen::error;
     /// # fn main() -> Result<(), error::Error> {
-    /// let qen: Zemen = Zemen::from_eth_cal(2000, Month::Meskerem, 1)?;
+    /// let qen: Zemen = Zemen::from_eth_cal(2000, Werh::Meskerem, 1)?;
     /// assert_eq!(qen.year(), 2000);
     /// Ok(())
     /// # }
@@ -80,15 +80,15 @@ impl Zemen {
     /// Get the month.
     ///
     /// ```rust
-    /// # use zemen::{Zemen, Month, error};
+    /// # use zemen::{Zemen, Werh, error};
     ///
     /// # fn main() -> Result<(), error::Error> {
-    /// let qen: Zemen = Zemen::from_eth_cal(2000, Month::Meskerem, 1)?;
-    /// assert_eq!(qen.month(), Month::Meskerem);
+    /// let qen: Zemen = Zemen::from_eth_cal(2000, Werh::Meskerem, 1)?;
+    /// assert_eq!(qen.month(), Werh::Meskerem);
     /// Ok(())
     /// # }
     /// ```
-    pub fn month(&self) -> Month {
+    pub fn month(&self) -> Werh {
         self.month
     }
 
@@ -96,11 +96,11 @@ impl Zemen {
     ///
     /// ```rust
     /// # use zemen::Zemen;
-    /// # use zemen::Month;
+    /// # use zemen::Werh;
     /// # use zemen::error;
     /// # fn main() -> Result<(), error::Error> {
     ///
-    /// let qen: Zemen = Zemen::from_eth_cal(2000, Month::Meskerem, 30)?;
+    /// let qen: Zemen = Zemen::from_eth_cal(2000, Werh::Meskerem, 30)?;
     /// assert_eq!(qen.day(), 30);
     /// # Ok(())
     /// # }
@@ -193,18 +193,18 @@ impl Zemen {
     /// Create an Ethiopian date from it's number representations
     ///
     /// ```rust
-    /// # use zemen::{Zemen, Month, error};
+    /// # use zemen::{Zemen, Werh, error};
     /// # fn main() -> Result<(), error::Error> {
-    /// let qen = Zemen::from_eth_cal(1992, Month::Tahasass, 22)?;
+    /// let qen = Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?;
     ///
     /// assert_eq!(qen.year(), 1992);
-    /// assert_eq!(qen.month(), Month::Tahasass);
+    /// assert_eq!(qen.month(), Werh::Tahasass);
     /// assert_eq!(qen.day(), 22);
     /// # Ok(())
     /// # }
     ///
     /// ```
-    pub fn from_eth_cal(year: i32, month: Month, day: u8) -> Result<Self, error::Error> {
+    pub fn from_eth_cal(year: i32, month: Werh, day: u8) -> Result<Self, error::Error> {
         Ok(Self::new(year, month as u8, day)?)
     }
 
@@ -215,7 +215,7 @@ impl Zemen {
     /// # use zemen::error;
     /// # use time::{Date, self};
     /// # fn main() -> Result<(), error::Error> {
-    /// let qen: Zemen = Zemen::from_eth_cal(1992, zemen::Month::Tahasass, 22)?;
+    /// let qen: Zemen = Zemen::from_eth_cal(1992, zemen::Werh::Tahasass, 22)?;
     /// let date: Date = Date::from_calendar_date(2000, time::Month::January, 1)?;
     ///
     /// assert_eq!(date, qen.to_gre());
@@ -234,19 +234,19 @@ impl Zemen {
     ///
     /// ```rust
     /// # use zemen::Zemen;
-    /// # use zemen::Month;
+    /// # use zemen::Werh;
     /// # use zemen::error;
     ///
     /// # fn main() -> Result<(), error::Error> {
-    /// assert_eq!(Zemen::from_jdn(2_451_545)?, Zemen::from_eth_cal(1992, Month::Tahasass, 22)?);
-    /// assert_eq!(Zemen::from_jdn(2_458_485)?, Zemen::from_eth_cal(2011, Month::Tahasass, 23)?);
-    /// assert_eq!(Zemen::from_jdn(2_458_849)?, Zemen::from_eth_cal(2012, Month::Tahasass, 21)?);
+    /// assert_eq!(Zemen::from_jdn(2_451_545)?, Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?);
+    /// assert_eq!(Zemen::from_jdn(2_458_485)?, Zemen::from_eth_cal(2011, Werh::Tahasass, 23)?);
+    /// assert_eq!(Zemen::from_jdn(2_458_849)?, Zemen::from_eth_cal(2012, Werh::Tahasass, 21)?);
     /// #   Ok(())
     /// # }
     /// ```
     pub fn from_jdn(jdn: i32) -> Result<Self, error::Error> {
         let (year, month, day) = conversion::jdn_to_eth(jdn);
-        let month: Month = Month::try_from(month)?;
+        let month: Werh = Werh::try_from(month)?;
         Ok(Self::from_eth_cal(year, month, day)?)
     }
 
@@ -254,13 +254,13 @@ impl Zemen {
     ///
     /// ```rust
     /// # use zemen::Zemen;
-    /// # use zemen::Month;
+    /// # use zemen::Werh;
     /// # use zemen::error;
     ///
     /// # fn main() -> Result<(), error::Error> {
-    /// assert_eq!(Zemen::from_eth_cal(1992, Month::Tahasass, 22)?.to_jdn(), 2_451_545);
-    /// assert_eq!(Zemen::from_eth_cal(2011, Month::Tahasass, 23)?.to_jdn(), 2_458_485);
-    /// assert_eq!(Zemen::from_eth_cal(2012, Month::Tahasass, 21)?.to_jdn(), 2_458_849);
+    /// assert_eq!(Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?.to_jdn(), 2_451_545);
+    /// assert_eq!(Zemen::from_eth_cal(2011, Werh::Tahasass, 23)?.to_jdn(), 2_458_485);
+    /// assert_eq!(Zemen::from_eth_cal(2012, Werh::Tahasass, 21)?.to_jdn(), 2_458_849);
     /// #   Ok(())
     /// # }
     /// ```
@@ -274,7 +274,7 @@ impl Zemen {
 #[cfg(test)]
 mod tests {
     use crate::Zemen;
-    use crate::Month;
+    use crate::Werh;
     use crate::error;
 
     #[test]
@@ -291,13 +291,13 @@ mod tests {
 
     #[test]
     fn test_month_creating_and_basic_parsing() -> Result<(), error::Error> {
-        let wer_num = Month::try_from(13)?;
-        let wer_enum_pag = Month::Puagme;
+        let wer_num = Werh::try_from(13)?;
+        let wer_enum_pag = Werh::Puagme;
 
         assert_eq!(wer_enum_pag, wer_num);
 
-        let wer_enum_mesk = Month::Meskerem;
-        let wer_str: Month = "Meskerem".parse()?;
+        let wer_enum_mesk = Werh::Meskerem;
+        let wer_str: Werh = "Meskerem".parse()?;
 
         assert_eq!(wer_enum_mesk, wer_str);
 
@@ -323,7 +323,7 @@ mod tests {
     fn test_trait_conersion() -> Result<(), error::Error>{
         use time::Date;
 
-        let qen = Zemen::from_eth_cal(1992, Month::Tahasass, 22)?;
+        let qen = Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?;
         let day: time::Date = Date::from(&qen);
 
         println!("qen: {}", qen);

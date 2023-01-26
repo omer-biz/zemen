@@ -46,3 +46,9 @@ fn main() -> Result<(), error::Error> {
     Ok(())
 }
 ```
+
+## TODO
+
+- [ ] Formatting
+- [ ] Weekdays support
+- [ ] Using an external crate to manage errors

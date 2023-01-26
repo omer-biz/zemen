@@ -14,62 +14,35 @@ Day number) and gregorian date.
 
 ## Installation
 
-Since the crate is still under heavy development, and me being a beginner rust
-programmer, it won't be published on `crates.io` yet. For now you can clone the
-repo and link to it in your `Cargo.toml` like so.
-
-```toml
-...snip...
-
-[dependencies]
-zemen = { path = "path/to/zemen/repo" }
-
-...snip...
+```sh
+cargo add zemen
 ```
 
 ## Usage
 
-### Basic Usage
-
-You can find the documantation at [here](https://omer-biz.github.io/zemen_doc/doc/zemen/index.html).
-
 ```rust
-use zemen;
+use time::{Date, Month};
+use zemen::{Zemen, Werh, error};
 
-fn main() {
-  // Returns the current Ethiopian date.
-  let zare: zemen::Zemen = zemen::Zemen::today();
+fn main() -> Result<(), error::Error> {
+    // creating dates
+    // Werh means month in Ge'ez
+    let qen = Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?;
+    let date = Date::from_calendar_date(2000, Month::January, 1)?;
 
-  // print: `ጥር 14/2015`
-  println!("Zare: {}", zare);
+    // conversion
+    let converted_day = Date::from(&qen);
+    let converted_qen = Zemen::from(&date);
 
-  // To access the individal elements
-  let year: i32 = zare.year(); // 2015
-  // Returns the `zemen::Month::Tir` enum which could be casted as `u8`
-  // to get the month representain in number
-  // let month_num: u8 = zemen::Month::Tir as u8;
-  let month: zemen::Month = zare.month(); // `Month::Tir`
-  let day: u8 = zare.day(); // 14
+    println!("date: {}", converted_day);
+    println!("qen: {}", converted_qen);
 
-  // printing the month will print the equvalent month in amharic
-  println!("{}", month); // prints: `ጥር`
-}
-```
+    // accessing individual element
+    println!("year: {}", qen.year());
+    println!("month: {}", qen.month());
+    println!("month(number): {}", qen.month() as u8);
+    println!("day: {}", qen.day());
 
-### Conversion
-
-```rust
-use time;
-use zemen;
-
-fn main() {
-  let qen = zemen::Zemen::from_eth_cal(1992, 4, 22).unwrap()
-  let day = time::Date::from_calendar_date(2000, time::Month::January, 1).unwrap();
-
-  // to convert Ethiopian to Greogroian
-  let converted_day: time::Date = qen.to_gre();
-
-  // To convert Gregorian to Ethiopian
-  let converted_qen: zemen::Zemen = zemen::Zemen::from_gre_date(&day);
+    Ok(())
 }
 ```

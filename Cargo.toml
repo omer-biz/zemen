@@ -1,6 +1,6 @@
 [package]
 name = "zemen"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Omer Abdulaziz <omerabdi@pm.me>"]
 rust-version = "1.66.0"

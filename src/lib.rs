@@ -21,6 +21,26 @@ impl fmt::Display for Zemen {
 }
 
 impl From<&Zemen> for time::Date {
+
+    /// Converts `zemen::Zemen`, which is in Ethiopian format,
+    /// to it's Gregorain format.
+    ///
+    /// ```rust
+    /// # use zemen::Zemen;
+    /// # use zemen::error;
+    /// # use time::Date;
+    /// # use time::Month;
+    /// # use zemen::Werh;
+    /// # fn main() -> Result<(), error::Error> {
+    /// let qen = Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?;
+    /// let day = Date::from(&qen);
+    ///
+    /// assert_eq!(2000, day.year());
+    /// assert_eq!(Month::January, day.month());
+    /// assert_eq!(1, day.day());
+    /// # Ok(())
+    /// # }
+    /// ```
     fn from(value: &Zemen) -> Self {
         Zemen::from_eth_date(&value)
     }
@@ -34,19 +54,22 @@ impl From<&Zemen> for time::Date {
 
 impl From<&time::Date> for Zemen {
 
-    /// Converts `time::Date`, which is in greogrian format,
-    /// to it's ethiopian format.
+    /// Converts `time::Date`, which is in Greogrian format,
+    /// to it's Ethiopian format.
     ///
     /// ```rust
     /// # use zemen::Zemen;
     /// # use zemen::error;
+    /// # use zemen::Werh;
     /// # use time::Date;
     /// # use time::Month;
     /// # fn main() -> Result<(), error::Error> {
     /// let day = Date::from_calendar_date(2000, Month::January, 1)?;
     /// let qen = Zemen::from(&day);
     ///
-    /// assert_eq!(day, qen.to_gre());
+    /// assert_eq!(1992, qen.year());
+    /// assert_eq!(Werh::Tahasass, qen.month());
+    /// assert_eq!(22, qen.day());
     /// # Ok(())
     /// # }
     /// ```
@@ -131,23 +154,23 @@ impl Zemen {
     /// returns a `Zemen` instance.
     ///
     /// ```rust
-    /// # use zemen::Zemen;
-    /// # use zemen::error;
-    /// # use time::{Date, Month};
+    /// # // use zemen::Zemen;
+    /// # // use zemen::error;
+    /// # // use time::{Date, Month};
     ///
-    /// # fn main() -> Result<(), error::Error> {
-    /// let date: Date = Date::from_calendar_date(2000, Month::January, 1)?;
-    /// let qen: Zemen = Zemen::from_gre_cal(2000, 1, 1)?;
+    /// # // fn main() -> Result<(), error::Error> {
+    /// # // let date: Date = Date::from_calendar_date(2000, Month::January, 1)?;
+    /// # // let qen: Zemen = Zemen::from_gre_cal(2000, 1, 1)?;
     ///
-    /// assert_eq!(date, qen.to_gre());
-    /// # Ok(())
-    /// # }
+    /// # // assert_eq!(date, qen.to_gre());
+    /// # // Ok(())
+    /// # // }
     /// ```
-    pub fn from_gre_cal(year: i32, month: u8, day: u8) -> Result<Self, error::Error> {
-        conversion::gre_to_eth(
-            year, month, day
-        )
-    }
+    // fn from_gre_cal(year: i32, month: u8, day: u8) -> Result<Self, error::Error> {
+    //     conversion::gre_to_eth(
+    //         year, month, day
+    //     )
+    // }
 
     /// Converts `&time::Date` (Gregorian date) to `zemen::Zemen` (Ethiopian date)
     ///

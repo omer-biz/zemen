@@ -67,7 +67,7 @@
 //!
 //! - [X] Weekdays support
 //! - [X] Using an external crate to manage errors
-//! - [ ] Use ordinal dates
+//! - [X] Use ordinal dates
 //! - [ ] Duration
 //! - [ ] Formatting
 //! - [ ] Date Validators

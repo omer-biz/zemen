@@ -6,9 +6,11 @@ use std::fmt;
 /// An Ethiopian Date.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Zemen {
-    year: i32,
-    month: Werh,
-    day: u8,
+    // the first 9 bits will store the ordinal day
+    // the rest is for the year.
+    // 0000 0000 0000 0000 0000 000 0 0000 0000
+    //           year               |ordian day
+    ordinal_date: i32,
 }
 
 impl fmt::Display for Zemen {
@@ -93,8 +95,9 @@ impl From<&time::Date> for Zemen {
 impl Zemen {
     pub(crate) fn new(year: i32, month: u8, day: u8) -> Result<Self, error::Error> {
         // TODO: validate Ethiopian date
-        let month = Werh::try_from(month)?;
-        Ok(Zemen { year, month, day })
+        Ok(Zemen {
+            ordinal_date: (year << 9) | conversion::to_ordinal(month as i32, day as i32),
+        })
     }
 
     /// Get the year.
@@ -112,7 +115,7 @@ impl Zemen {
     /// # }
     /// ```
     pub fn year(&self) -> i32 {
-        self.year
+        self.ordinal_date >> 9
     }
 
     /// Get the month.
@@ -129,7 +132,8 @@ impl Zemen {
     /// # }
     /// ```
     pub fn month(&self) -> Werh {
-        self.month
+        let (month, _) = conversion::from_ordinal(self.ordinal_date & 0x1ff);
+        Werh::try_from(month as u8).expect("validated by new")
     }
 
     /// Get the day of the month.
@@ -148,7 +152,8 @@ impl Zemen {
     /// # }
     /// ```
     pub fn day(&self) -> u8 {
-        self.day
+        let (_, day) = conversion::from_ordinal(self.ordinal_date & 0x1ff);
+        day as u8
     }
 
     /// returns the current date in Ethiopian date.

@@ -50,6 +50,20 @@ pub fn gre_to_eth(year: i32, month: u8, day: u8) -> Result<Zemen, error::Error> 
     Zemen::new(year, month, day)
 }
 
+pub fn to_ordinal(month: i32, day: i32) -> i32 {
+    (month - 1) * 30 + day
+}
+
+pub fn from_ordinal(ordinal_day: i32) -> (i32, i32) {
+    let mut month = (ordinal_day / 30) + 1;
+    let mut day = ordinal_day % 30;
+    if day == 0 {
+        month -= 1;
+        day = 30;
+    }
+    (month, day)
+}
+
 #[cfg(test)]
 mod basic_conversion {
     use super::*;
@@ -71,6 +85,44 @@ mod basic_conversion {
         // assert_eq!(zemen, gre_to_eth(1923, 5, 15)?);
 
         Ok(())
+    }
+
+    #[test]
+    fn test_to_ordinal() {
+        let ordinal = to_ordinal(1, 30);
+        assert_eq!(30, ordinal);
+
+        let ordinal = to_ordinal(1, 10);
+        assert_eq!(10, ordinal);
+
+        let ordinal = to_ordinal(2, 2);
+        assert_eq!(32, ordinal);
+
+        let ordinal = to_ordinal(3, 2);
+        assert_eq!(62, ordinal);
+    }
+
+    #[test]
+    fn test_from_ordinal() {
+        let (month, day) = from_ordinal(62);
+        assert_eq!(month, 3);
+        assert_eq!(day, 2);
+
+        let (month, day) = from_ordinal(60);
+        assert_eq!(month, 2);
+        assert_eq!(day, 30);
+
+        let (month, day) = from_ordinal(65);
+        assert_eq!(month, 3);
+        assert_eq!(day, 5);
+
+        let (month, day) = from_ordinal(30);
+        assert_eq!(month, 1);
+        assert_eq!(day, 30);
+
+        let (month, day) = from_ordinal(10);
+        assert_eq!(month, 1);
+        assert_eq!(day, 10);
     }
 
     #[test]

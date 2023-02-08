@@ -1,6 +1,6 @@
 //! Todo: Documentations.
 
-use crate::{conversion, error, Samint, Werh};
+use crate::{conversion, error, validator, Samint, Werh};
 use std::fmt;
 
 /// An Ethiopian Date.
@@ -95,6 +95,11 @@ impl From<&time::Date> for Zemen {
 impl Zemen {
     pub(crate) fn new(year: i32, month: u8, day: u8) -> Result<Self, error::Error> {
         // TODO: validate Ethiopian date
+        let is_valid = validator::is_valid_date(year, month, day);
+        if is_valid == false {
+            return Err(error::Error::InvalidDate(format!("{year}-{month}-{day}")));
+        }
+
         Ok(Zemen {
             ordinal_date: (year << 9) | conversion::to_ordinal(month as i32, day as i32),
         })

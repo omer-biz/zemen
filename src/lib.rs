@@ -74,6 +74,7 @@
 
 mod conversion;
 mod samint;
+mod validator;
 mod werh;
 mod zemen;
 

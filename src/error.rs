@@ -17,4 +17,7 @@ pub enum Error {
 
     #[error("conversion faild")]
     DateConversion(#[from] time::error::ComponentRange),
+
+    #[error("invalid {0} date given")]
+    InvalidDate(String),
 }

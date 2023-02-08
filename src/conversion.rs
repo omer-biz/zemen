@@ -79,11 +79,6 @@ mod basic_conversion {
         let zemen = Zemen::new(1915, 9, 7)?;
         assert_eq!(zemen, gre_to_eth(1923, 5, 15)?);
 
-        // should fail
-        // TODO: validate ethiopian dates
-        // let zemen = Zemen::new(1915, 13, 7);
-        // assert_eq!(zemen, gre_to_eth(1923, 5, 15)?);
-
         Ok(())
     }
 

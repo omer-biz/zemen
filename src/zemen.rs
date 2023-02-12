@@ -9,7 +9,7 @@ pub struct Zemen {
     // the first 9 bits will store the ordinal day
     // the rest is for the year.
     // 0000 0000 0000 0000 0000 000 0 0000 0000
-    //           year               |ordian day
+    //           year               |ordianl day
     ordinal_date: i32,
 }
 
@@ -94,14 +94,38 @@ impl From<&time::Date> for Zemen {
 
 impl Zemen {
     pub(crate) fn new(year: i32, month: u8, day: u8) -> Result<Self, error::Error> {
-        // TODO: validate Ethiopian date
         let is_valid = validator::is_valid_date(year, month, day);
-        if is_valid == false {
+        if !is_valid {
             return Err(error::Error::InvalidDate(format!("{year}-{month}-{day}")));
         }
 
+        Self::from_ordinal_date(year, conversion::to_ordinal(month as i32, day as i32) as _)
+    }
+
+    /// Attempt to create a `Zemen` from the year and day number.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use zemen::Zemen;
+    /// # use zemen::Werh;
+    /// # use zemen::error;
+    /// # fn main() -> Result<(), error::Error> {
+    /// let qen = Zemen::from_ordinal_date(2000, 62)?;
+    /// assert_eq!(qen, Zemen::from_eth_cal(2000, Werh::Hedar, 2)?);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn from_ordinal_date(year: i32, ordinal: u16) -> Result<Self, error::Error> {
+        error::is_in_range(
+            ordinal as _,
+            1,
+            validator::days_in_year(year) as _,
+            "ordinal",
+        )?;
+
         Ok(Zemen {
-            ordinal_date: (year << 9) | conversion::to_ordinal(month as i32, day as i32),
+            ordinal_date: (year << 9) | ordinal as i32,
         })
     }
 
@@ -137,7 +161,7 @@ impl Zemen {
     /// # }
     /// ```
     pub fn month(&self) -> Werh {
-        let (month, _) = conversion::from_ordinal(self.ordinal_date & 0x1ff);
+        let (month, _) = conversion::from_ordinal(self.ordinal() as _);
         Werh::try_from(month as u8).expect("validated by new")
     }
 
@@ -157,7 +181,7 @@ impl Zemen {
     /// # }
     /// ```
     pub fn day(&self) -> u8 {
-        let (_, day) = conversion::from_ordinal(self.ordinal_date & 0x1ff);
+        let (_, day) = conversion::from_ordinal(self.ordinal() as _);
         day as u8
     }
 
@@ -358,6 +382,38 @@ impl Zemen {
     pub fn previous(self) -> Self {
         Self::from_jdn(self.to_jdn() - 1).expect("decrementing by one won't panic")
     }
+
+    /// Get the day of the year.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use zemen::{error, Zemen, Werh};
+    /// # fn main() -> Result<(), error::Error> {
+    /// let qen = Zemen::from_eth_cal(1992, Werh::Meskerem, 15)?;
+    /// assert_eq!(qen.ordinal(), 15);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn ordinal(&self) -> u16 {
+        (self.ordinal_date & 0x1ff) as _
+    }
+
+    /// Get the year, and day of the year.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use zemen::{error, Zemen, Werh};
+    /// # fn main() -> Result<(), error::Error> {
+    /// let qen = Zemen::from_eth_cal(1992, Werh::Meskerem, 15)?;
+    /// assert_eq!(qen.ordinal_date(), (1992, 15));
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn ordinal_date(&self) -> (i32, u16) {
+        (self.year(), self.ordinal())
+    }
 }
 
 #[cfg(test)]
@@ -409,7 +465,7 @@ mod tests {
     }
 
     #[test]
-    fn test_trait_conersion() -> Result<(), error::Error> {
+    fn test_trait_conversion() -> Result<(), error::Error> {
         use time::Date;
 
         let qen = Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?;
@@ -418,5 +474,20 @@ mod tests {
         println!("qen: {}", qen);
         println!("day: {}", day);
         Ok(())
+    }
+
+    #[test]
+    fn test_ordinal_date_creation() {
+        let qen = Zemen::from_ordinal_date(2001, 366);
+        assert!(qen.is_err());
+
+        let qen = Zemen::from_ordinal_date(2000, 367);
+        assert!(qen.is_err());
+
+        let qen = Zemen::from_ordinal_date(2000, 366);
+        assert!(qen.is_ok());
+
+        let qen = Zemen::from_ordinal_date(2001, 365);
+        assert!(qen.is_ok());
     }
 }

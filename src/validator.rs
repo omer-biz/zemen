@@ -12,18 +12,35 @@ pub fn is_valid_date(year: i32, month: u8, day: u8) -> bool {
     } else if month == 13 && day > 5 {
         return false;
     }
-    return true;
+    true
+}
+
+pub fn days_in_year(year: i32) -> u16 {
+    if is_leap_year(year) {
+        366
+    } else {
+        365
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{is_leap_year, is_valid_date};
+    use super::{days_in_year, is_leap_year, is_valid_date};
 
     #[test]
     fn validator_leap_year() {
         for year_offset in (0..=40).step_by(4) {
             assert!(is_leap_year(2000 + year_offset));
         }
+    }
+
+    #[test]
+    fn validator_days_in_year() {
+        assert_eq!(days_in_year(2000), 366);
+        assert_ne!(days_in_year(2000), 365);
+
+        assert_eq!(days_in_year(2001), 365);
+        assert_ne!(days_in_year(2001), 366);
     }
 
     #[test]

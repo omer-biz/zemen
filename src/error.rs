@@ -21,3 +21,16 @@ pub enum Error {
     #[error("invalid {0} date given")]
     InvalidDate(String),
 }
+
+pub fn is_in_range(value: i32, min: i32, max: i32, name: &'static str) -> Result<(), Error> {
+    if value >= min && value <= max {
+        return Ok(());
+    } else {
+        Err(Error::InvalidRange {
+            name,
+            given: value,
+            min,
+            max,
+        })
+    }
+}

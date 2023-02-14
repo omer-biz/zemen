@@ -1,7 +1,9 @@
 //! Todo: Documentations.
 
+type Result<T> = std::result::Result<T, crate::error::Error>;
+
 use crate::{conversion, error, validator, Samint, Werh};
-use std::fmt;
+use std::{fmt, ops::Add};
 
 /// An Ethiopian Date.
 #[derive(Debug, PartialEq, Clone)]
@@ -92,8 +94,32 @@ impl From<&time::Date> for Zemen {
     }
 }
 
+impl Add<i32> for Zemen {
+    type Output = Zemen;
+
+    /// Adding a number to a `Zemen` instance will advance it by the number.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use zemen::Zemen;
+    /// # use zemen::error;
+    /// # use zemen::Werh;
+    /// # fn main() -> Result<(), error::Error> {
+    /// let qen = Zemen::from_eth_cal(2003, Werh::Puagme, 1)?;
+    /// let qen = qen + 6;
+    ///
+    /// assert_eq!(qen, Zemen::from_eth_cal(2004, Werh::Meskerem, 1)?);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn add(self, days: i32) -> Self::Output {
+        Zemen::from_jdn(self.to_jdn() + days).expect("`to_jdn` gives us a valid jdn date")
+    }
+}
+
 impl Zemen {
-    pub(crate) fn new(year: i32, month: u8, day: u8) -> Result<Self, error::Error> {
+    pub(crate) fn new(year: i32, month: u8, day: u8) -> Result<Self> {
         let is_valid = validator::is_valid_date(year, month, day);
         if !is_valid {
             return Err(error::Error::InvalidDate(format!("{year}-{month}-{day}")));
@@ -116,7 +142,7 @@ impl Zemen {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn from_ordinal_date(year: i32, ordinal: u16) -> Result<Self, error::Error> {
+    pub fn from_ordinal_date(year: i32, ordinal: u16) -> Result<Self> {
         error::is_in_range(
             ordinal as _,
             1,
@@ -259,7 +285,7 @@ impl Zemen {
     /// # }
     ///
     /// ```
-    pub fn from_eth_cal(year: i32, month: Werh, day: u8) -> Result<Self, error::Error> {
+    pub fn from_eth_cal(year: i32, month: Werh, day: u8) -> Result<Self> {
         Self::new(year, month as u8, day)
     }
 
@@ -303,7 +329,7 @@ impl Zemen {
     /// #   Ok(())
     /// # }
     /// ```
-    pub fn from_jdn(jdn: i32) -> Result<Self, error::Error> {
+    pub fn from_jdn(jdn: i32) -> Result<Self> {
         let (year, month, day) = conversion::jdn_to_eth(jdn);
         let month: Werh = Werh::try_from(month)?;
 
@@ -419,6 +445,7 @@ impl Zemen {
 #[cfg(test)]
 mod tests {
     use crate::error;
+    use crate::error::Error;
     use crate::Werh;
     use crate::Zemen;
 
@@ -481,13 +508,33 @@ mod tests {
         let qen = Zemen::from_ordinal_date(2001, 366);
         assert!(qen.is_err());
 
-        let qen = Zemen::from_ordinal_date(2000, 367);
+        let qen = Zemen::from_ordinal_date(2003, 367);
         assert!(qen.is_err());
 
-        let qen = Zemen::from_ordinal_date(2000, 366);
+        let qen = Zemen::from_ordinal_date(2003, 366);
         assert!(qen.is_ok());
 
         let qen = Zemen::from_ordinal_date(2001, 365);
         assert!(qen.is_ok());
+    }
+
+    #[test]
+    fn test_adding_days_to_zemen() -> Result<(), Error> {
+        let qen = Zemen::from_eth_cal(2000, Werh::Meskerem, 1)?;
+        let qen = qen + 30;
+
+        assert_eq!(qen, Zemen::from_eth_cal(2000, Werh::Tikimit, 1)?);
+
+        let qen = Zemen::from_eth_cal(2000, Werh::Puagme, 1)?;
+        let qen = qen + 6;
+
+        assert_eq!(qen, Zemen::from_eth_cal(2001, Werh::Meskerem, 2)?);
+
+        let qen = Zemen::from_eth_cal(2003, Werh::Puagme, 1)?;
+        let qen = qen + 6;
+
+        assert_eq!(qen, Zemen::from_eth_cal(2004, Werh::Meskerem, 1)?);
+
+        Ok(())
     }
 }

@@ -4,6 +4,8 @@ use std::str::FromStr;
 
 use crate::error;
 
+type Result<T> = std::result::Result<T, crate::error::Error>;
+
 /// Months of the Ethiopian year. `Werh` means month in Ge'ez.
 #[repr(u8)]
 #[derive(Clone, Debug, PartialEq, Copy)]
@@ -95,7 +97,7 @@ impl TryFrom<u8> for Werh {
     /// # Ok(())
     /// # }
     /// ```
-    fn try_from(num: u8) -> Result<Self, Self::Error> {
+    fn try_from(num: u8) -> Result<Self> {
         match num {
             1 => Ok(Self::Meskerem),
             2 => Ok(Self::Tikimit),
@@ -138,7 +140,7 @@ impl FromStr for Werh {
     /// # Ok(())
     /// # }
     /// ```
-    fn from_str(month_name: &str) -> Result<Self, Self::Err> {
+    fn from_str(month_name: &str) -> Result<Self> {
         match month_name.to_lowercase().as_str() {
             "meskerem" => Ok(Werh::Meskerem),
             "tikimit" => Ok(Werh::Tikimit),

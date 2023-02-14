@@ -1,5 +1,5 @@
 pub fn is_leap_year(year: i32) -> bool {
-    year % 4 == 0
+    year % 4 == 3
 }
 
 pub fn is_valid_date(year: i32, month: u8, day: u8) -> bool {
@@ -30,14 +30,14 @@ mod tests {
     #[test]
     fn validator_leap_year() {
         for year_offset in (0..=40).step_by(4) {
-            assert!(is_leap_year(2000 + year_offset));
+            assert!(is_leap_year(2000 + year_offset + 3));
         }
     }
 
     #[test]
     fn validator_days_in_year() {
-        assert_eq!(days_in_year(2000), 366);
-        assert_ne!(days_in_year(2000), 365);
+        assert_eq!(days_in_year(2003), 366);
+        assert_ne!(days_in_year(2000), 366);
 
         assert_eq!(days_in_year(2001), 365);
         assert_ne!(days_in_year(2001), 366);
@@ -51,7 +51,7 @@ mod tests {
         let (year, month, day) = (2001, 13, 5);
         assert!(is_valid_date(year, month, day));
 
-        let (year, month, day) = (2000, 13, 6);
+        let (year, month, day) = (2003, 13, 6);
         assert!(is_valid_date(year, month, day));
 
         let (year, month, day) = (2000, 13, 7);

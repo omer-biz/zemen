@@ -79,6 +79,18 @@ impl Werh {
             Self::Puagme => Self::Nehase,
         }
     }
+
+    /// Get the short name of the month.
+    ///
+    /// # Examples
+    /// ```rust
+    /// # use zemen::Werh;
+    /// assert_eq!(Werh::Meskerem.short_name(), "መስከ");
+    /// assert_eq!(Werh::Tir.short_name(), "ጥር");
+    /// ```
+    pub fn short_name(&self) -> String {
+        self.to_string().chars().take(3).collect()
+    }
 }
 
 impl TryFrom<u8> for Werh {
@@ -146,9 +158,11 @@ impl FromStr for Werh {
             "tikimit" => Ok(Werh::Tikimit),
             "hedar" => Ok(Werh::Hedar),
             "tahasass" => Ok(Werh::Tahasass),
+            "tir" => Ok(Werh::Tir),
             "yekatit" => Ok(Werh::Yekatit),
             "megabit" => Ok(Werh::Megabit),
             "miyazia" => Ok(Werh::Miyazia),
+            "ginbot" => Ok(Werh::Ginbot),
             "sene" => Ok(Werh::Sene),
             "hamle" => Ok(Werh::Hamle),
             "nehase" => Ok(Werh::Nehase),
@@ -206,6 +220,15 @@ mod test {
         match w {
             Ok(o) => println!("o: {}", o),
             Err(e) => panic!("should succeed, failed with {}", e),
+        }
+    }
+
+    #[test]
+    fn test_short_names() {
+        for w in 1..=13 {
+            let w = Werh::try_from(w).expect("Should be within 1 and 13");
+
+            println!("Short Month Name: {}", w.short_name());
         }
     }
 }

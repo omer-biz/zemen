@@ -61,6 +61,18 @@ impl Samint {
             Samint::Kidame => Samint::Arb,
         }
     }
+
+    /// Get short name of the Weekday
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use zemen::Samint;
+    /// assert_eq!(Samint::Ihud.short_name(), "እሑድ")
+    /// ```
+    pub fn short_name(&self) -> String {
+        self.to_string().chars().take(3).collect()
+    }
 }
 
 impl TryFrom<u8> for Samint {
@@ -169,6 +181,15 @@ mod tests {
         match elet {
             Ok(o) => panic!("should fail, succeeded with: {}", o),
             Err(e) => println!("e: {}", e),
+        }
+    }
+
+    #[test]
+    fn test_short_weekday_names() {
+        for e in 0..=6 {
+            let elet = Samint::try_from(e).expect("should be between 0 and 6");
+
+            println!("Short day name: {}", elet.short_name());
         }
     }
 }

@@ -2,7 +2,7 @@
 
 type Result<T> = std::result::Result<T, crate::error::Error>;
 
-use crate::{conversion, error, validator, Samint, Werh};
+use crate::{conversion, error, formatting, validator, Samint, Werh};
 use std::{fmt, ops::Add};
 
 /// An Ethiopian Date.
@@ -439,6 +439,40 @@ impl Zemen {
     /// ```
     pub fn ordinal_date(&self) -> (i32, u16) {
         (self.year(), self.ordinal())
+    }
+
+    /// Formats the current date given a format specifires.
+    ///
+    /// currently the supported format specifires are:
+    /// ```txt
+    ///     %%     a literal %
+    ///     %m     month (01..13)
+    ///     %Y     year
+    ///     %d     day of month (e.g., 01)
+    ///     %B     full month name (e.g., መስከረም)
+    ///     %b     abbreviated month name (e.g., መስከ)
+    ///     %A     full weekday name (e.g., ማክሰኞ)
+    ///     %a     abbreviated weekday name (e.g., ማክሰ)
+    ///     %j     day of year (001..366)
+    ///     %y     last two digits of year (00..99)
+    ///     %q     quarter of year (1..4), returns 5 in the 13th month
+    /// ```
+    ///
+    /// Note: if a single `%` is given it will be consumed. It also doesn't
+    /// work with unicode.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use zemen::*;
+    /// # fn main() -> Result<(), error::Error> {
+    /// let qen = Zemen::from_eth_cal(2015, Werh::Tir, 10)?;
+    /// assert_eq!(&qen.format("%a, %b %d-%Y")[..], "ረቡዕ, ጥር 10-2015");
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn format(&self, pattern: &str) -> String {
+        formatting::format(self, pattern)
     }
 }
 

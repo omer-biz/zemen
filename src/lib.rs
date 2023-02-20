@@ -62,17 +62,31 @@
 //! #   Ok(())
 //! # }
 //! ```
+//! ## Formatting
+//!
+//! ```rust
+//! # use zemen::*;
+//! # fn main() -> Result<(), error::Error> {
+//! let qen = Zemen::from_eth_cal(2015, Werh::Tir, 10)?;
+//! let formatted = qen.format("%a, %b %d-%Y");
+//!
+//! // prints: ዛሬ ረቡዕ, ጥር 10-2015 ነው
+//! println!("{}", format!("ዛሬ {} ነው", formatted));
+//! # Ok(())
+//! # }
+//! ```
 //!
 //! ## TODO
 //!
 //! - [X] Weekdays support
 //! - [X] Using an external crate to manage errors
 //! - [X] Use ordinal dates
+//! - [X] Formatting
+//! - [X] Date Validators
 //! - [ ] Duration
-//! - [ ] Formatting
-//! - [ ] Date Validators
 
 mod conversion;
+mod formatting;
 mod samint;
 mod validator;
 mod werh;

@@ -458,8 +458,8 @@ impl Zemen {
     ///     %q     quarter of year (1..4), returns 5 in the 13th month
     /// ```
     ///
-    /// Note: if a single `%` is given it will be consumed. It also doesn't
-    /// work with unicode.
+    /// Note: if a single `%`, or `%` with unknown format specifier is given
+    /// it will be consumed.
     ///
     /// # Examples
     ///
@@ -467,7 +467,7 @@ impl Zemen {
     /// # use zemen::*;
     /// # fn main() -> Result<(), error::Error> {
     /// let qen = Zemen::from_eth_cal(2015, Werh::Tir, 10)?;
-    /// assert_eq!(&qen.format("%a, %b %d-%Y")[..], "ረቡዕ, ጥር 10-2015");
+    /// assert_eq!(&qen.format("ዛሬ ቀን %a, %b %d-%Y ነው")[..], "ዛሬ ቀን ረቡዕ, ጥር 10-2015 ነው");
     /// # Ok(())
     /// # }
     /// ```

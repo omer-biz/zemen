@@ -14,32 +14,28 @@ use crate::Zemen;
 
 pub(crate) fn format(qen: &Zemen, pattern: &str) -> String {
     let mut formated = String::new();
-    let byte_sequence = pattern.as_bytes();
+    let mut byte_sequence = pattern.chars();
 
-    let mut index = 0;
-    while let Some(ch) = byte_sequence.get(index) {
-        if ch == &b'%' {
-            if let Some(next_ch) = byte_sequence.get(index + 1) {
-                match next_ch {
-                    b'%' => formated.push('%'),
-                    b'm' => formated.push_str(&(qen.month() as u8).to_string()),
-                    b'Y' => formated.push_str(&qen.year().to_string()),
-                    b'y' => formated.push_str(&(qen.year() % 100).to_string()),
-                    b'd' => formated.push_str(&qen.day().to_string()),
-                    b'B' => formated.push_str(&qen.month().to_string()),
-                    b'b' => formated.push_str(&qen.month().short_name()),
-                    b'A' => formated.push_str(&qen.weekday().to_string()),
-                    b'a' => formated.push_str(&qen.weekday().short_name()),
-                    b'j' => formated.push_str(&qen.ordinal().to_string()),
-                    b'q' => formated.push_str(&(((qen.ordinal() * 4) / 360) + 1).to_string()),
-                    _ => (),
-                }
-                index += 1;
+    while let Some(ch) = byte_sequence.next() {
+        if ch == '%' {
+            match byte_sequence.next() {
+                Some('%') => formated.push('%'),
+                Some('m') => formated.push_str(&(qen.month() as u8).to_string()),
+                Some('Y') => formated.push_str(&qen.year().to_string()),
+                Some('y') => formated.push_str(&(qen.year() % 100).to_string()),
+                Some('d') => formated.push_str(&qen.day().to_string()),
+                Some('B') => formated.push_str(&qen.month().to_string()),
+                Some('b') => formated.push_str(&qen.month().short_name()),
+                Some('A') => formated.push_str(&qen.weekday().to_string()),
+                Some('a') => formated.push_str(&qen.weekday().short_name()),
+                Some('j') => formated.push_str(&qen.ordinal().to_string()),
+                Some('q') => formated.push_str(&(((qen.ordinal() * 4) / 360) + 1).to_string()),
+                Some(oth) => formated.push(oth),
+                _ => (),
             }
         } else {
-            formated.push(*ch as char);
+            formated.push(ch);
         }
-        index += 1;
     }
 
     formated
@@ -52,14 +48,45 @@ mod tests {
     use super::*;
 
     #[test]
-    fn some_test() {
+    fn test_format_specifiers() {
+        // with ascii
         for i in 1..=13 {
             let qen = Zemen::from_eth_cal(2001, Werh::try_from(i).unwrap(), 1).unwrap();
-            let out = format(&qen, "% %j <%q>  %d-%m-%Y<<<%y>>>>->  %B  %b %A %a %%aa");
-            println!("{}", out);
+            let out = format(&qen, "% %j <%q>  %d-%m-%Y<<<%y>>>>->  %B  %b %A %a %%aa %z");
+
+            assert_eq!(
+                out,
+                format!(
+                    " {} <{}>  {}-{}-{}<<<{}>>>>->  {}  {} {} {} %aa z",
+                    qen.ordinal(),
+                    (qen.ordinal() * 4 / 360) + 1,
+                    qen.day(),
+                    qen.month() as u8,
+                    qen.year(),
+                    qen.year() % 100,
+                    qen.month(),
+                    qen.month().short_name(),
+                    qen.weekday(),
+                    qen.weekday().short_name()
+                )
+            );
         }
-        let qen = Zemen::from_eth_cal(13, Werh::try_from(3).unwrap(), 1).unwrap();
-        let out = format(&qen, "% %j <%q>  %d-%m-%Y<<<%y>>>>->  %B  %b %A %a %%a");
-        println!("{}", out);
+
+        // with unicode
+        for i in 1..=12 {
+            let qen = Zemen::from_eth_cal(2003, Werh::try_from(i).unwrap(), i + 10).unwrap();
+            let out = format(&qen, "ዛሬ ቀን %A, %B %d %Y ነው");
+
+            assert_eq!(
+                out,
+                format!(
+                    "ዛሬ ቀን {}, {} {} {} ነው",
+                    qen.weekday(),
+                    qen.month(),
+                    qen.day(),
+                    qen.year()
+                )
+            );
+        }
     }
 }

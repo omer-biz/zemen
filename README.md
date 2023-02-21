@@ -68,19 +68,10 @@ fn main() -> Result<(), error::Error> {
 use zemen::*;
 fn main() -> Result<(), error::Error> {
   let qen = Zemen::from_eth_cal(2015, Werh::Tir, 10)?;
-  let formatted = qen.format("%a, %b %d-%Y");
+  let formatted = qen.format("ዛሬ %a, %b %d-%Y ነው");
 
   // prints: ዛሬ ረቡዕ, ጥር 10-2015 ነው
-  println!("{}", format!("ዛሬ {} ነው", formatted));
+  println!("{}", formatted);
   Ok(())
 }
 ```
-
-## TODO
-
-- [X] Weekdays support
-- [X] Using an external crate to manage errors
-- [X] Use ordinal dates
-- [X] Formatting
-- [X] Date Validators
-- [ ] Duration

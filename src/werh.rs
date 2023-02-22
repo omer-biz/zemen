@@ -102,12 +102,10 @@ impl TryFrom<u8> for Werh {
     ///
     /// ```rust
     /// # use zemen::{Werh, error};
-    /// # fn main() -> Result<(), error::Error> {
     /// let wer = Werh::try_from(9)?;
     ///
     /// assert_eq!(Werh::Ginbot, wer);
-    /// # Ok(())
-    /// # }
+    /// # Ok::<(), error::Error>(())
     /// ```
     fn try_from(num: u8) -> Result<Self> {
         match num {
@@ -143,14 +141,12 @@ impl FromStr for Werh {
     ///
     /// ```rust
     /// # use zemen::{Werh, error};
-    /// # fn main() -> Result<(), error::Error> {
     /// let mesk: Werh = "meskerem".parse()?;
     /// let tikm = "TiKimiT".parse::<Werh>()?;
     ///
     /// assert_eq!(Werh::Meskerem, mesk);
     /// assert_eq!(Werh::Tikimit, tikm);
-    /// # Ok(())
-    /// # }
+    /// # Ok::<(), error::Error>(())
     /// ```
     fn from_str(month_name: &str) -> Result<Self> {
         match month_name.to_lowercase().as_str() {

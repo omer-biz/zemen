@@ -84,12 +84,10 @@ impl TryFrom<u8> for Samint {
     ///
     /// ```rust
     /// # use zemen::{error, Samint};
-    /// # fn main() -> Result<(), error::Error> {
     /// let elet = Samint::try_from(0)?;
     ///
     /// assert_eq!(Samint::Ihud, elet);
-    /// # Ok(())
-    /// # }
+    /// # Ok::<(), error::Error>(())
     /// ```
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
@@ -142,12 +140,10 @@ impl FromStr for Samint {
     ///
     /// ```rust
     /// # use zemen::{Samint, error};
-    /// # fn main() -> Result<(), error::Error> {
     /// let qen: Samint = "ihuD".parse()?;
     ///
     /// assert_eq!(Samint::Ihud, qen);
-    /// # Ok(())
-    /// # }
+    /// # Ok::<(), error::Error>(())
     /// ```
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {

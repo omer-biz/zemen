@@ -48,8 +48,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_format_specifiers() {
-        // with ascii
+    fn test_format_specifiers_with_ascii() {
         for i in 1..=13 {
             let qen = Zemen::from_eth_cal(2001, Werh::try_from(i).unwrap(), 1).unwrap();
             let out = format(&qen, "% %j <%q>  %d-%m-%Y<<<%y>>>>->  %B  %b %A %a %%aa %z");
@@ -71,7 +70,10 @@ mod tests {
                 )
             );
         }
+    }
 
+    #[test]
+    fn test_format_specifiers_with_unicode() {
         // with unicode
         for i in 1..=12 {
             let qen = Zemen::from_eth_cal(2003, Werh::try_from(i).unwrap(), i + 10).unwrap();

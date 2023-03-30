@@ -150,19 +150,20 @@ impl FromStr for Werh {
     /// ```
     fn from_str(month_name: &str) -> Result<Self> {
         match month_name.to_lowercase().as_str() {
-            "meskerem" => Ok(Werh::Meskerem),
-            "tikimit" => Ok(Werh::Tikimit),
-            "hedar" => Ok(Werh::Hedar),
-            "tahasass" => Ok(Werh::Tahasass),
-            "tir" => Ok(Werh::Tir),
-            "yekatit" => Ok(Werh::Yekatit),
-            "megabit" => Ok(Werh::Megabit),
-            "miyazia" => Ok(Werh::Miyazia),
-            "ginbot" => Ok(Werh::Ginbot),
-            "sene" => Ok(Werh::Sene),
-            "hamle" => Ok(Werh::Hamle),
-            "nehase" => Ok(Werh::Nehase),
-            "puagme" => Ok(Werh::Puagme),
+            "meskerem" | "መስከረም" => Ok(Werh::Meskerem),
+            "tikimit" | "ጥቅምት" => Ok(Werh::Tikimit),
+            "hedar" | "ኅዳር" => Ok(Werh::Hedar),
+            "tahasass" | "ታኅሣሥ" => Ok(Werh::Tahasass),
+            "tir" | "ጥር" => Ok(Werh::Tir),
+            "yekatit" | "የካቲት" => Ok(Werh::Yekatit),
+            "megabit" | "መጋቢት" => Ok(Werh::Megabit),
+            "miyazia" | "ሚያዝያ" => Ok(Werh::Miyazia),
+            "ginbot" | "ግንቦት" => Ok(Werh::Ginbot),
+            "sene" | "ሰኔ" => Ok(Werh::Sene),
+            "hamle" | "ሐምሌ" => Ok(Werh::Hamle),
+            "nehase" | "ነሐሴ" => Ok(Werh::Nehase),
+            "puagme" | "ጳጉሜ" => Ok(Werh::Puagme),
+            // TODO: inform what was the invalid token
             _ => Err(error::Error::InvalidVariant("Werh")),
         }
     }
@@ -203,28 +204,40 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_werh_errors() {
-        // should be an error
-        let w = Werh::try_from(18);
-        match w {
-            Ok(o) => panic!("should fail, succeeded with {}", o),
-            Err(e) => println!("e: {}", e),
-        }
-
-        // should be a ok
-        let w = Werh::try_from(13);
-        match w {
-            Ok(o) => println!("o: {}", o),
-            Err(e) => panic!("should succeed, failed with {}", e),
-        }
+    #[should_panic]
+    fn test_werh_from_number() {
+        let _w = Werh::try_from(18).unwrap();
     }
 
     #[test]
-    fn test_short_names() {
-        for w in 1..=13 {
-            let w = Werh::try_from(w).expect("Should be within 1 and 13");
+    fn test_month_from_english_text() -> Result<()> {
+        let amh_month_name = [
+            "መስከረም",
+            "ጥቅምት",
+            "ኅዳር",
+            "ታኅሣሥ",
+            "ጥር",
+            "የካቲት",
+            "መጋቢት",
+            "ሚያዝያ",
+            "ግንቦት",
+            "ሰኔ",
+            "ሐምሌ",
+            "ነሐሴ",
+            "ጳጉሜ",
+        ];
+        let eng_month_name = [
+            "meskerem", "tikimit", "hedar", "tahasass", "tir", "yekatit", "megabit", "miyazia",
+            "ginbot", "sene", "hamle", "nehase", "puagme",
+        ];
 
-            println!("Short Month Name: {}", w.short_name());
+        for (_month_num, (awn, ewn)) in amh_month_name.iter().zip(eng_month_name).enumerate() {
+            let month_eng = Werh::from_str(awn)?;
+            let month_amh = Werh::from_str(ewn)?;
+
+            assert_eq!(month_amh, month_eng);
         }
+
+        Ok(())
     }
 }

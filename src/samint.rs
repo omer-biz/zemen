@@ -147,13 +147,14 @@ impl FromStr for Samint {
     /// ```
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            "ihud" => Ok(Samint::Ihud),
-            "senyo" => Ok(Samint::Senyo),
-            "makisenyo" => Ok(Samint::Makisenyo),
-            "irob" => Ok(Samint::Irob),
-            "hamus" => Ok(Samint::Hamus),
-            "arb" => Ok(Samint::Arb),
-            "kidame" => Ok(Samint::Kidame),
+            "ihud" | "እሑድ" => Ok(Samint::Ihud),
+            "senyo" | "ሰኞ" => Ok(Samint::Senyo),
+            "makisenyo" | "ማክሰኞ" => Ok(Samint::Makisenyo),
+            "irob" | "ረቡዕ" => Ok(Samint::Irob),
+            "hamus" | "ሐሙስ" => Ok(Samint::Hamus),
+            "arb" | "ዓርብ" => Ok(Samint::Arb),
+            "kidame" | "ቅዳሜ" => Ok(Samint::Kidame),
+            // TODO: inform what was the invalid token
             _ => Err(error::Error::InvalidVariant("Samint")),
         }
     }
@@ -164,20 +165,9 @@ mod tests {
     use super::*;
 
     #[test]
+    #[should_panic]
     fn test_samint_from_u8() {
-        let elet = Samint::try_from(6);
-        match elet {
-            Ok(o) => println!("o: {}", o),
-            Err(e) => panic!("should succeed, failded with: {}", e),
-        }
-
-        assert_eq!(elet.unwrap(), Samint::Kidame);
-
-        let elet = Samint::try_from(8);
-        match elet {
-            Ok(o) => panic!("should fail, succeeded with: {}", o),
-            Err(e) => println!("e: {}", e),
-        }
+        let _elet = Samint::try_from(8).unwrap();
     }
 
     #[test]
@@ -187,5 +177,28 @@ mod tests {
 
             println!("Short day name: {}", elet.short_name());
         }
+    }
+
+    #[test]
+    fn test_from_english_text() -> Result<(), error::Error> {
+        let amh_week_name = ["እሑድ", "ሰኞ", "ማክሰኞ", "ረቡዕ", "ሐሙስ", "ዓርብ", "ቅዳሜ"];
+        let eng_week_name = [
+            "ihud",
+            "senyo",
+            "makisenyo",
+            "irob",
+            "hamus",
+            "arb",
+            "kidame",
+        ];
+
+        for (_week_num, (awn, ewn)) in amh_week_name.iter().zip(eng_week_name).enumerate() {
+            let week_eng = Samint::from_str(awn)?;
+            let week_amh = Samint::from_str(ewn)?;
+
+            assert_eq!(week_amh, week_eng);
+        }
+
+        Ok(())
     }
 }

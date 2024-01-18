@@ -1,9 +1,9 @@
 [package]
 name = "zemen"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 authors = ["Omer Abdulaziz <omerabdi@pm.me>"]
-rust-version = "1.66.0"
+rust-version = "1.75.0"
 description = "Ethiopian to Gregorian conversion utility"
 readme = "README.md"
 repository = "https://github.com/omer-biz/zemen/"

@@ -12,8 +12,8 @@ pub enum Error {
         max: i32,
     },
 
-    #[error("can not parse {0}")]
-    InvalidVariant(&'static str),
+    #[error("can not parse {0}, invalid token `{1}`")]
+    InvalidVariant(&'static str, String),
 
     #[error("conversion faild")]
     DateConversion(#[from] time::error::ComponentRange),
@@ -24,7 +24,7 @@ pub enum Error {
 
 pub fn is_in_range(value: i32, min: i32, max: i32, name: &'static str) -> Result<(), Error> {
     if value >= min && value <= max {
-        return Ok(());
+        Ok(())
     } else {
         Err(Error::InvalidRange {
             name,

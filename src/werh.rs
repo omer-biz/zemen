@@ -149,7 +149,8 @@ impl FromStr for Werh {
     /// # Ok::<(), error::Error>(())
     /// ```
     fn from_str(month_name: &str) -> Result<Self> {
-        match month_name.to_lowercase().as_str() {
+        let lower = month_name.to_lowercase();
+        match lower.as_str() {
             "meskerem" | "መስከረም" => Ok(Werh::Meskerem),
             "tikimit" | "ጥቅምት" => Ok(Werh::Tikimit),
             "hedar" | "ኅዳር" => Ok(Werh::Hedar),
@@ -163,8 +164,7 @@ impl FromStr for Werh {
             "hamle" | "ሐምሌ" => Ok(Werh::Hamle),
             "nehase" | "ነሐሴ" => Ok(Werh::Nehase),
             "puagme" | "ጳጉሜ" => Ok(Werh::Puagme),
-            // TODO: inform what was the invalid token
-            _ => Err(error::Error::InvalidVariant("Werh")),
+            _ => Err(error::Error::InvalidVariant("Werh", lower)),
         }
     }
 }

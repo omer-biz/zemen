@@ -146,7 +146,9 @@ impl FromStr for Samint {
     /// # Ok::<(), error::Error>(())
     /// ```
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
+        let lower = s.to_lowercase();
+
+        match lower.as_str() {
             "ihud" | "እሑድ" => Ok(Samint::Ihud),
             "senyo" | "ሰኞ" => Ok(Samint::Senyo),
             "makisenyo" | "ማክሰኞ" => Ok(Samint::Makisenyo),
@@ -154,8 +156,7 @@ impl FromStr for Samint {
             "hamus" | "ሐሙስ" => Ok(Samint::Hamus),
             "arb" | "ዓርብ" => Ok(Samint::Arb),
             "kidame" | "ቅዳሜ" => Ok(Samint::Kidame),
-            // TODO: inform what was the invalid token
-            _ => Err(error::Error::InvalidVariant("Samint")),
+            _ => Err(error::Error::InvalidVariant("Samint", lower)),
         }
     }
 }

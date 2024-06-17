@@ -113,11 +113,7 @@ impl Add<i32> for Zemen {
 
 impl Zemen {
     pub(crate) fn new(year: i32, month: u8, day: u8) -> Result<Self> {
-        let is_valid = validator::is_valid_date(year, month, day);
-        if !is_valid {
-            return Err(error::Error::InvalidDate(format!("{year}-{month}-{day}")));
-        }
-
+        validator::is_valid_date(year, month, day)?;
         Self::from_ordinal_date(year, conversion::to_ordinal(month as i32, day as i32) as _)
     }
 

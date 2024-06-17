@@ -68,7 +68,7 @@ fn main() -> Result<(), error::Error> {
 use zemen::*;
 fn main() -> Result<(), error::Error> {
   let qen = Zemen::from_eth_cal(2015, Werh::Tir, 10)?;
-  let formatted = qen.format("ዛሬ %a, %b %d-%Y ነው");
+  let formatted = qen.format("ዛሬ DD, MMM D-YYYY ነው");
 
   // prints: ዛሬ ረቡዕ, ጥር 10-2015 ነው
   println!("{}", formatted);

@@ -23,7 +23,6 @@
 //! ## Usage
 //!
 //! ```rust
-//! use time::{Date, Month};
 //! use zemen::{Zemen, Werh};
 //! # use zemen::error;
 //!
@@ -31,14 +30,6 @@
 //! // creating dates
 //! // Werh means month in Ge'ez
 //! let qen = Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?;
-//! let date = Date::from_calendar_date(2000, Month::January, 1)?;
-//!
-//! // conversion
-//! let converted_day = Date::from(&qen);
-//! let converted_qen = Zemen::from(&date);
-//!
-//! println!("date: {}", converted_day);
-//! println!("qen: {}", converted_qen);
 //!
 //! // accessing individual element
 //! println!("year: {}", qen.year());
@@ -75,6 +66,31 @@
 //! # Ok(())
 //! # }
 //! ```
+//! ## `time` feature
+//! Assuming you've enabled the `time` feature, you can convert between `time::Date` and `zemen::Zemen`.
+//!
+//! ```rust
+//! # #[cfg(feature = "time")]
+//! # {
+//! # use zemen::*;
+//!
+//! # use time::{Date, Month};
+//!
+//! # fn main() -> Result<(), error::Error> {
+//! let qen = Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?;
+//! let date = Date::from_calendar_date(2000, Month::January, 1)?;
+//!
+//! // conversion
+//! let converted_day = Date::from(&qen);
+//! let converted_qen = Zemen::from(&date);
+//!
+//! println!("date: {}", converted_day);
+//! println!("qen: {}", converted_qen);
+//! # Ok(())
+//! # }
+//! # }
+//! ```
+//!
 
 mod conversion;
 mod formatting;

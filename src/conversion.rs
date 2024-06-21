@@ -1,7 +1,12 @@
 //! Todo: Documentations
 
-use crate::error;
+#[cfg(feature = "time")]
 use crate::Zemen;
+
+use crate::error;
+
+#[cfg(feature = "time")]
+use time::Date;
 
 const JDN_EPOCH_OFFSET_ETH: i32 = 1_723_856;
 
@@ -32,7 +37,7 @@ pub fn jdn_to_eth(jdn: i32) -> (i32, u8, u8) {
 }
 
 /// Tries to create a Gregorian date from Ethiopian date.
-///
+#[cfg(feature = "time")]
 pub fn eth_to_gre(year: i32, month: u8, day: u8) -> Result<time::Date, error::Error> {
     let jdn = eth_to_jdn(year, month as i32, day as i32);
     let date = time::Date::from_julian_day(jdn)?;
@@ -42,6 +47,7 @@ pub fn eth_to_gre(year: i32, month: u8, day: u8) -> Result<time::Date, error::Er
 
 /// Tries to create an Ethiopian date from Gregorian date.
 ///
+#[cfg(feature = "time")]
 pub fn gre_to_eth(year: i32, month: u8, day: u8) -> Result<Zemen, error::Error> {
     let month = time::Month::try_from(month)?;
     let date = time::Date::from_calendar_date(year, month, day)?;
@@ -69,6 +75,7 @@ mod basic_conversion {
     use super::*;
 
     #[test]
+    #[cfg(feature = "time")]
     fn test_gre_to_eth() -> Result<(), error::Error> {
         let zemen = Zemen::new(1992, 4, 22)?;
         assert_eq!(zemen, gre_to_eth(2000, 1, 1)?);
@@ -121,6 +128,7 @@ mod basic_conversion {
     }
 
     #[test]
+    #[cfg(feature = "time")]
     fn test_eth_to_gre() -> Result<(), error::Error> {
         let (year, month, day) = (2000, 1, 1);
         let month = time::Month::try_from(month)?;

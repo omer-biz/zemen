@@ -18,6 +18,7 @@ pub enum Error {
     InvalidVariant(&'static str, String),
 
     #[error("conversion faild")]
+    #[cfg(feature = "time")]
     DateConversion(#[from] time::error::ComponentRange),
 }
 

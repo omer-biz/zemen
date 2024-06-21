@@ -12,19 +12,17 @@
 use crate::Zemen;
 
 pub(crate) fn format(qen: &Zemen, pattern: &str) -> String {
-    let formated = pattern
+    pattern
         .replace("YYYY", &qen.year().to_string())
         .replace("YY", &format!("{:02}", (qen.year() % 100)))
         .replace("MMM", &qen.month().to_string())
         .replace("MM", &qen.month().short_name())
-        .replace("M", &format!("{:02}", (qen.month() as u8)))
+        .replace('M', &format!("{:02}", (qen.month() as u8)))
         .replace("DDD", &qen.weekday().to_string())
         .replace("DD", &qen.weekday().short_name())
-        .replace("D", &format!("{:02}", qen.day()))
+        .replace('D', &format!("{:02}", qen.day()))
         .replace("JJ", &format!("{:03}", qen.ordinal()))
-        .replace("QQ", &format!("{:02}", (qen.ordinal() / 4 / 360) + 1));
-
-    formated
+        .replace("QQ", &format!("{:02}", (qen.ordinal() / 4 / 360) + 1))
 }
 
 #[cfg(test)]

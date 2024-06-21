@@ -173,10 +173,11 @@ mod tests {
 
     #[test]
     fn test_short_weekday_names() {
+        let names = ["እሑድ", "ሰኞ", "ማክሰ", "ረቡዕ", "ሐሙስ", "ዓርብ", "ቅዳሜ"];
+
         for e in 0..=6 {
             let elet = Samint::try_from(e).expect("should be between 0 and 6");
-
-            println!("Short day name: {}", elet.short_name());
+            assert_eq!(elet.short_name(), names[e as usize]);
         }
     }
 

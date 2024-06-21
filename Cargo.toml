@@ -15,4 +15,8 @@ categories = ["date-and-time"]
 
 [dependencies]
 thiserror = "1.0.56"
-time = "0.3.31"
+time = { version = "0.3.31", optional = true }
+
+[features]
+default = ["time"]
+time = ["dep:time"]

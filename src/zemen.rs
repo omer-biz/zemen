@@ -38,6 +38,7 @@ impl fmt::Display for Zemen {
     }
 }
 
+#[cfg(feature = "time")]
 impl From<&Zemen> for time::Date {
     /// Converts `zemen::Zemen`, which is in Ethiopian format,
     /// to it's Gregorain format.
@@ -59,10 +60,13 @@ impl From<&Zemen> for time::Date {
     /// # Ok::<(), error::Error>(())
     /// ```
     fn from(value: &Zemen) -> Self {
-        Zemen::from_eth_date(value)
+        // Zemen::from_eth_date(value)
+        conversion::eth_to_gre(value.year(), value.month() as u8, value.day())
+            .expect("From already a validated date")
     }
 }
 
+#[cfg(feature = "time")]
 impl From<&time::Date> for Zemen {
     /// Converts `time::Date`, which is in Greogrian format,
     /// to it's Ethiopian format.
@@ -85,7 +89,7 @@ impl From<&time::Date> for Zemen {
     /// # Ok::<(), error::Error>(())
     /// ```
     fn from(value: &time::Date) -> Self {
-        Self::from_gre_date(value)
+        Self::from_date(value)
     }
 }
 
@@ -205,6 +209,7 @@ impl Zemen {
     ///
     /// assert_eq!(today, zare.to_gre());
     /// ```
+    #[cfg(feature = "time")]
     pub fn today() -> Self {
         let today = time::OffsetDateTime::now_utc().date();
         conversion::gre_to_eth(today.year(), today.month() as u8, today.day())
@@ -221,34 +226,14 @@ impl Zemen {
     /// # use time::{Date, Month};
     ///
     /// let date: Date = Date::from_calendar_date(2000, Month::January, 1)?;
-    /// let qen: Zemen = Zemen::from_gre_date(&date);
+    /// let qen: Zemen = Zemen::from_date(&date);
     /// assert_eq!(date, qen.to_gre());
     /// # Ok::<(), error::Error>(())
     /// ```
-    pub fn from_gre_date(gc_date: &time::Date) -> Self {
+    #[cfg(feature = "time")]
+    pub fn from_date(gc_date: &time::Date) -> Self {
         conversion::gre_to_eth(gc_date.year(), gc_date.month() as u8, gc_date.day())
             .expect("since `gc_date` is a valid date the returned date will also be valid")
-    }
-
-    /// Converts `&zemen::Zemen` (Ethiopian date) to `time::Date` (Gregorian date)
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// # use zemen::Zemen;
-    /// # use zemen::Werh;
-    /// # use zemen::error;
-    /// # use time::{Date, Month};
-    ///
-    /// let qen: Zemen = Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?;
-    /// let date: Date = Zemen::from_eth_date(&qen);
-    ///
-    /// assert_eq!(date, Date::from_calendar_date(2000, Month::January, 1)?);
-    /// # Ok::<(), error::Error>(())
-    /// ```
-    pub fn from_eth_date(et_date: &Zemen) -> time::Date {
-        conversion::eth_to_gre(et_date.year(), et_date.month() as u8, et_date.day())
-            .expect("`et_date` is valid, no need to error")
     }
 
     /// Create an Ethiopian date from it's number representations
@@ -269,6 +254,24 @@ impl Zemen {
         Self::new(year, month as u8, day)
     }
 
+    /// Create an Ethiopian date from Gregorian date
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use zemen::{Zemen, error, Werh};
+    ///
+    /// let qen: Zemen = Zemen::from_gre_cal(2000, 1, 1)?;
+    /// assert_eq!(qen.year(), 1992);
+    /// assert_eq!(qen.month(), Werh::Tahasass);
+    /// assert_eq!(qen.day(), 22);
+    /// # Ok::<(), error::Error>(())
+    /// ```
+    #[cfg(feature = "time")]
+    pub fn from_gre_cal(year: i32, month: u8, day: u8) -> Result<Self> {
+        conversion::gre_to_eth(year, month, day)
+    }
+
     /// Convertes the current Ethiopian date in `time::Date`.
     ///
     /// # Examples
@@ -283,6 +286,7 @@ impl Zemen {
     /// assert_eq!(date, qen.to_gre());
     /// # Ok::<(), error::Error>(())
     /// ```
+    #[cfg(feature = "time")]
     pub fn to_gre(&self) -> time::Date {
         conversion::eth_to_gre(
             self.year(),
@@ -335,12 +339,10 @@ impl Zemen {
     /// # Examples
     ///
     /// ```rust
-    /// # use time::{Month, Date};
-    /// # use zemen::{Werh, Zemen, error};
+    /// # use zemen::{Werh, Zemen, error, Samint};
     /// let qen = Zemen::from_eth_cal(1992, Werh::Tahasass, 22)?;
-    /// let day = Date::from_calendar_date(2000, Month::January, 1)?;
-    /// // becauce `time::Weekday` starts with `Monday` we have to increment by one
-    /// assert_eq!(qen.weekday() as u8, day.weekday() as u8 + 1);
+    /// // because `time::Weekday` starts with `Monday` we have to increment by one
+    /// assert_eq!(qen.weekday(),  Samint::Kidame);
     /// # Ok::<(), error::Error>(())
     /// ```
     pub fn weekday(&self) -> Samint {
@@ -409,28 +411,25 @@ impl Zemen {
     ///
     /// currently the supported format specifires are:
     /// ```txt
-    ///     %%     a literal %
-    ///     %m     month (01..13)
-    ///     %Y     year
-    ///     %d     day of month (e.g., 01)
-    ///     %B     full month name (e.g., መስከረም)
-    ///     %b     abbreviated month name (e.g., መስከ)
-    ///     %A     full weekday name (e.g., ማክሰኞ)
-    ///     %a     abbreviated weekday name (e.g., ማክሰ)
-    ///     %j     day of year (001..366)
-    ///     %y     last two digits of year (00..99)
-    ///     %q     quarter of year (1..4), returns 5 in the 13th month
-    /// ```
     ///
-    /// Note: if a single `%`, or `%` with unknown format specifier is given
-    /// it will be consumed.
+    /// YY       The last two digits of year (00..99)
+    /// YYYY     Full Year
+    /// M        Month (01..12)
+    /// MM       Abbreviated month name (e.g., መስከ)
+    /// MMM      Full Month Name (e.g., መስከረም)
+    /// D        Day of Month (1..31)
+    /// DD       Day of Week Abbreviated (e.g., ማክሰ)
+    /// DDD      Day of Week (e.g., ማክሰ)
+    /// JJ       Day of Year (001..366)
+    /// QQ       Quarter of Year (1..4)
+    /// ```
     ///
     /// # Examples
     ///
     /// ```rust
     /// # use zemen::*;
     /// let qen = Zemen::from_eth_cal(2015, Werh::Tir, 10)?;
-    /// assert_eq!(&qen.format("ዛሬ ቀን %a, %b %d-%Y ነው")[..], "ዛሬ ቀን ረቡዕ, ጥር 10-2015 ነው");
+    /// assert_eq!(&qen.format("ዛሬ ቀን DD, MM D-YYYY ነው")[..], "ዛሬ ቀን ረቡዕ, ጥር 10-2015 ነው");
     /// # Ok::<(), error::Error>(())
     /// ```
     pub fn format(&self, pattern: &str) -> String {
@@ -446,6 +445,7 @@ mod tests {
     use crate::Zemen;
 
     #[test]
+    // #[cfg(feature = "time")]
     fn test_get_current_date_and_convert_to_gre() {
         let zare = Zemen::today();
         println!("Zare (initiated): {}", zare);
@@ -453,7 +453,7 @@ mod tests {
         let converted_date = zare.to_gre();
         println!("Today (converted): {}", converted_date);
 
-        let converted_zare = Zemen::from_gre_date(&converted_date);
+        let converted_zare = Zemen::from_date(&converted_date);
         println!("Zare (converted): {}", converted_zare);
     }
 
@@ -468,9 +468,6 @@ mod tests {
         let wer_str: Werh = "Meskerem".parse()?;
 
         assert_eq!(wer_enum_mesk, wer_str);
-
-        println!("wer_num: {}", wer_num);
-        println!("wer_str: {}", wer_str);
 
         Ok(())
     }
@@ -488,6 +485,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "time")]
     fn test_trait_conversion() -> Result<(), error::Error> {
         use time::Date;
 

@@ -5,9 +5,6 @@ use crate::Zemen;
 
 use crate::error;
 
-#[cfg(feature = "time")]
-use time::Date;
-
 const JDN_EPOCH_OFFSET_ETH: i32 = 1_723_856;
 
 fn modl(i: i32, j: i32) -> i32 {

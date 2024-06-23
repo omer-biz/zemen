@@ -6,7 +6,7 @@ use crate::{conversion, error, formatting, validator, Samint, Werh};
 use std::{fmt, ops::Add};
 
 /// An Ethiopian Date.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 pub struct Zemen {
     // the first 9 bits will store the ordinal day
     // the rest is for the year.
@@ -27,6 +27,18 @@ impl fmt::Display for Zemen {
     /// assert_eq!(qen.to_string(), "2000-01-01");
     /// # Ok::<(), error::Error>(())
     /// ```
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{:04}-{:02}-{:02}",
+            self.year(),
+            self.month() as u8,
+            self.day()
+        )
+    }
+}
+
+impl fmt::Debug for Zemen {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,

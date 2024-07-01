@@ -52,6 +52,22 @@ pub fn days_in_year(year: i32) -> u16 {
     }
 }
 
+#[cfg(not(feature = "time"))]
+pub mod gre {
+
+    pub fn is_leap_year(year: u64) -> bool {
+        (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+    }
+
+    pub fn days_in_year(year: u64) -> u16 {
+        if is_leap_year(year) {
+            366
+        } else {
+            365
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{days_in_year, is_leap_year, is_valid_date};

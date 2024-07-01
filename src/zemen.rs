@@ -5,6 +5,9 @@ type Result<T> = std::result::Result<T, crate::error::Error>;
 use crate::{conversion, error, formatting, validator, Samint, Werh};
 use std::{fmt, ops::Add};
 
+#[cfg(not(feature = "time"))]
+use std::time::SystemTime;
+
 /// An Ethiopian Date.
 #[derive(PartialEq, Clone)]
 pub struct Zemen {
@@ -213,6 +216,8 @@ impl Zemen {
     /// # Examples
     ///
     /// ```rust
+    /// # #[cfg(feature = "time")]
+    /// # {
     /// # use time;
     /// # use zemen::Zemen;
     ///
@@ -220,12 +225,40 @@ impl Zemen {
     /// let zare: Zemen = Zemen::today();
     ///
     /// assert_eq!(today, zare.to_gre());
+    /// # }
+    ///
+    /// # #[cfg(not(feature = "time"))]
+    /// # {
+    /// # use zemen::Zemen;
+    /// let zare: Zemen = Zemen::today();
+    ///
+    /// println!("zare: {}", zare);
+    /// # }
     /// ```
-    #[cfg(feature = "time")]
     pub fn today() -> Self {
-        let today = time::OffsetDateTime::now_utc().date();
-        conversion::gre_to_eth(today.year(), today.month() as u8, today.day())
-            .expect("Since `today` is valid conversion won't fail")
+        #[cfg(feature = "time")]
+        {
+            let today = time::OffsetDateTime::now_utc().date();
+            Zemen::from_date(&today)
+        }
+
+        #[cfg(not(feature = "time"))]
+        {
+            let system_time = SystemTime::now();
+
+            // epoch is on 1970-01-01
+            let since_epoch = match system_time.duration_since(SystemTime::UNIX_EPOCH) {
+                Ok(duration) => duration,
+                Err(err) => panic!("Now can not be pre 1970: {}", err),
+            }
+            .as_secs();
+
+            let (year, ordinal) = conversion::timestamp_to_ordinal(since_epoch);
+            let jdn = conversion::ordinal_gre_to_jdn(year, ordinal);
+            let (year, month, day) = conversion::jdn_to_eth(jdn as i32);
+
+            Zemen::new(year, month, day).expect("valid date")
+        }
     }
 
     /// Converts `&time::Date` (Gregorian date) to `zemen::Zemen` (Ethiopian date)
@@ -457,7 +490,7 @@ mod tests {
     use crate::Zemen;
 
     #[test]
-    // #[cfg(feature = "time")]
+    #[cfg(feature = "time")]
     fn test_get_current_date_and_convert_to_gre() {
         let zare = Zemen::today();
         println!("Zare (initiated): {}", zare);

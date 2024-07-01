@@ -1,9 +1,10 @@
 //! Todo: Documentations
 
 #[cfg(feature = "time")]
-use crate::Zemen;
+use crate::{error, Zemen};
 
-use crate::error;
+#[cfg(not(feature = "time"))]
+use crate::validator::gre;
 
 const JDN_EPOCH_OFFSET_ETH: i32 = 1_723_856;
 
@@ -65,6 +66,27 @@ pub fn from_ordinal(ordinal_day: i32) -> (i32, i32) {
         day = 30;
     }
     (month, day)
+}
+
+#[cfg(not(feature = "time"))]
+pub fn ordinal_gre_to_jdn(year: u64, ordinal: u16) -> u64 {
+    let ordinal = ordinal as u64;
+    ordinal + 365 * year + (year / 4) - (year / 100) + (year / 400) + 1_721_425
+}
+
+#[cfg(not(feature = "time"))]
+pub fn timestamp_to_ordinal(timestamp: u64) -> (u64, u16) {
+    const SECONDS_IN_A_DAY: u64 = 86_400;
+
+    let mut days_since_epoch = timestamp / SECONDS_IN_A_DAY;
+
+    let mut year = 1970;
+    while days_since_epoch >= gre::days_in_year(year).into() {
+        days_since_epoch -= gre::days_in_year(year) as u64;
+        year += 1;
+    }
+
+    (year, days_since_epoch as u16)
 }
 
 #[cfg(test)]
@@ -143,5 +165,12 @@ mod basic_conversion {
         assert_eq!(gre_date, eth_to_gre(1915, 9, 7)?);
 
         Ok(())
+    }
+
+    #[test]
+    #[cfg(not(feature = "time"))]
+    fn test_date_from_timestamp() {
+        let a = timestamp_to_ordinal(1719855086);
+        println!("a: {:?}", a);
     }
 }

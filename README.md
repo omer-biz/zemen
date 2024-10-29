@@ -1,5 +1,16 @@
 # Zemen - የ ኢትዮጵያ ቀን መቁጠሪያ
 
+> [!WARNING]
+> I've recently discovered a bug that may impact its accuracy The `Zemen::today`
+> function doesn't properly return the current date when the `time` feature is
+> disabled. At this time, I'm unable to resolve the issue immediately. I
+> encourage users to submit a pull request if they’re interested in contributing
+> a fix. In the meantime, you may want to explore alternative crates that provide
+> similar functionality or use the crate with the `time` feature turned on.
+> 
+> Thank you for your understanding and support! I’ll update this message as soon
+> as a resolution is available.
+
 ## Introduction
 
 A date conversion crate to convert between ethiopian and gregorian dates. We

@@ -17,7 +17,7 @@ pub enum Error {
     #[error("can not parse {0}, invalid token `{1}`")]
     InvalidVariant(&'static str, String),
 
-    #[error("conversion faild")]
+    #[error("conversion failed")]
     #[cfg(feature = "time")]
     DateConversion(#[from] time::error::ComponentRange),
 }

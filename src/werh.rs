@@ -96,7 +96,7 @@ impl Werh {
 impl TryFrom<u8> for Werh {
     type Error = error::Error;
 
-    /// Converts an `u8` to it's `Werh` equvalent
+    /// Converts an `u8` to it's `Werh` equivalent
     ///
     /// # Examples
     ///
@@ -135,7 +135,7 @@ impl TryFrom<u8> for Werh {
 impl FromStr for Werh {
     type Err = error::Error;
 
-    /// Parses the given string to `Werh`. It's case insenstive.
+    /// Parses the given string to `Werh`. It's case insensitive.
     ///
     /// # Examples
     ///
